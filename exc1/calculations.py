@@ -1,12 +1,16 @@
-from flask import Flask
+from flask import Flask, request
 app = Flask("hello")
 
 @app.route("/")
 def index():
     return "How to use: we have many endpoint URLs that you can call some of them are: \n asd"
 
-@app.route("/hello/<name>/")
-def hello(name):
+@app.route("/hello/")
+def hello():
+    try:
+        name = request.args["name"]
+    except KeyError:
+        return "Missing query parameter: name", 400
     return f"Hello {name}"
 
 @app.route("/add/<float:number_1>/<float:number_2>/")

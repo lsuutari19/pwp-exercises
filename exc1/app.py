@@ -1,37 +1,63 @@
 from flask import Flask, request
-from math import radians
+from math import radians, sin, cos, tan
 app = Flask("hello")
 
 @app.route("/")
 def index():
-    return "How to use: we have many endpoint URLs that you can call some of them are: \n asd"
+    # basic introduction to the routing system present
+    return "How to use: we have many endpoint URLs that you can call some of them are: \n /hello/ and /trig/<sin, cos or tan>/?angle=<float>/unit=<radian or degree>"
 
-@app.route("/hello/<name>/")
-def hello(name):
+@app.route("/hello/")
+def hello():
+    # basic sanity check
+    try:
+        name = request.args["name"]
+    except KeyError:
+        return "Missing query parameter: name", 400
     return f"Hello {name}"
 
-@app.route("/add/<float:number_1>/<float:number_2>/")
-def plus(number_1, number_2):
-    return f"The result of the addition is {float(number_1) + float(number_2)}"
+@app.route("/trig/<func>/")
+def trig(func):
+    """
+        Here you have multiple routing options; sin, cos and tan.
+        Usage:
+            -each route requires one of the functions mentioned above'
+            -give an angle
+            -give an unit (defaults to radians) --> if degree it will be converted to radians
+        Example:
+            localhost:5000/trig/sin/?angle=90&unit=degree
+            localhost:5000/trig/cos/?angle=3.14
+    """
 
-@app.route("/sub/<float:number_1>/<float:number_2>/")
-def minus(number_1, number_2):
-    return f"The result of the substraction is {float(number_1) - float(number_2)}"
+    # first make sure that an angle is given, if not return 400
+    functions = ["sin", "cos", "tan"]
+    try:
+        angle = float(request.args.get("angle"))
+    except TypeError:
+        return "400: Missing query parameter: angle"
+    except ValueError:
+        return "400: Invalid query parameter value(s)"
 
-@app.route("/mult/<float:number_1>/<float:number_2>/")
-def mult(number_1, number_2):
-    return f"The result of the multiplying is {float(number_1) * float(number_2)}"
+    unit = str(request.args.get("unit"))
 
-@app.route("/div/<float:number_1>/<float:number_2>/")
-def div(number_1, number_2):
-    if(number_2 == 0.0):
-        return "NaN"
-    return f"The result of the substraction is {float(number_1) / float(number_2)}"
-
-@app.route("/trig/<func>")
-def trig(angle, unit):
+    # check that the function exists if not return 404
+    # and check that the unit is either "radian" or "degree" if not return 400
+    # default unit to radian if nothing given
+    if(func not in functions):
+        return "404: Operation not found"
+    if(unit != "None"):
+        print("got here!", unit)
+        if(unit != "radian" and unit != "degree"):
+            return "400: Invalid query parameter value(s)"
+        if(unit == "degree"):
+            angle = radians(angle)
     if not(unit):
         unit = "radian"
-    if(request.args.get("unit") == "degree"):
-        unit = radians(int("unit"))
-    angle = request.args.get("angle") 
+    
+    # return the result of the calculation
+    if(func == "sin"):
+        return f"200: {round(sin(angle), 3)}"
+    if(func == "cos"):
+        return f"200: {round(cos(angle), 3)}"
+    if(func == "tan"):
+        return f"200: {round(tan(angle), 3)}"
