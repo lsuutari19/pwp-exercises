@@ -4,3 +4,7 @@ deactivate
 If you name your code file app.py, you can run it simply by typing:
 flask run
 flask --debug run
+
+initializing database (make sure to be in venv)
+$ flask shell
+>>> db.create_all()
