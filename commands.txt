@@ -1,0 +1,6 @@
+pwp\Scripts\activate.bat
+deactivate
+
+If you name your code file app.py, you can run it simply by typing:
+flask run
+flask --debug run
