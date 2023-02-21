@@ -8,3 +8,6 @@ flask --debug run
 initializing database (make sure to be in venv)
 $ flask shell
 >>> db.create_all()
+
+better way to do the above is to add this after app = SQLAlchemy(app)
+app.app_context().push()

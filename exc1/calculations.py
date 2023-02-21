@@ -21,8 +21,8 @@ def plus(number_1, number_2):
 def minus(number_1, number_2):
     return f"The result of the substraction is {float(number_1) - float(number_2)}"
 
-@app.route("/mult/<float:number_1>/<float:number_2>/")
-def mult(number_1, number_2):
+@app.route("/mul/<float:number_1>/<float:number_2>/")
+def mul(number_1, number_2):
     return f"The result of the multiplying is {float(number_1) * float(number_2)}"
 
 @app.route("/div/<float:number_1>/<float:number_2>/")
