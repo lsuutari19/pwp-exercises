@@ -1,4 +1,5 @@
 pwp\Scripts\activate.bat
+C:\Users\Suturri\pwp-exercises\env\Scripts\activate.bat
 deactivate
 
 If you name your code file app.py, you can run it simply by typing:
