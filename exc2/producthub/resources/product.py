@@ -2,6 +2,8 @@ from flask import Flask, request, Response
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import NotFound
+from werkzeug.routing import BaseConverter
 
 
 app = Flask(__name__)
@@ -67,6 +69,20 @@ class ProductCollection(Resource):
         response.headers["Location"] = f"/api/products/{handle}/"
         return response
 
+class ProductConverter(BaseConverter):
 
-api.add_resource(ProductCollection, "/api/products/")
-app.run(debug=True)
+    def to_python(self, product_name):
+        db_product = Product.query.filter_by(handle=product_name).first()
+        if db_product is None:
+            raise NotFound
+        return db_product
+        
+    def to_url(self, db_product):
+        return db_product.handle
+
+
+app.url_map.converters["product"] = ProductConverter
+api.add_resource(ProductCollection, "/api/products/<product:product>")
+
+#api.add_resource(ProductCollection, "/api/products/")
+#app.run(debug=True)
