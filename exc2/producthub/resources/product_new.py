@@ -1,8 +1,9 @@
-import sys
 from flask import Flask, request, Response
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import NotFound
+from werkzeug.routing import BaseConverter
 
 
 app = Flask(__name__)
@@ -42,7 +43,6 @@ class ProductCollection(Resource):
         return Response(status=501)
 
     def post(self):
-        print("asd")
         try:
             handle = request.json["handle"]
             weight = request.json["weight"]
@@ -66,23 +66,23 @@ class ProductCollection(Resource):
         except IntegrityError:
             return "Handle already exists", 409
         response = Response(status=201)
-        print(handle)
-        response.headers["location"] = api.url_for(ProductItem, product=handle)
+        response.headers["location"] = api.url_for(ProductCollection, Location=handle)
         return response
 
-class ProductItem(Resource):
+class ProductConverter(BaseConverter):
 
-    def get(self, product):
-        pass
+    def to_python(self, product_name):
+        db_product = Product.query.filter_by(handle=product_name).first()
+        if db_product is None:
+            raise NotFound
+        return db_product
+        
+    def to_url(self, db_product):
+        return db_product.handle
 
-    def put(self, product):
-        pass
-    def delete(self, product):
-        pass
 
-db.create_all()
+app.url_map.converters["product"] = ProductConverter
+api.add_resource(ProductCollection, "/api/products/<product:product>")
 
-
-api.add_resource(ProductCollection, "/api/products/")
-api.add_resource(ProductItem, "/api/products/<product>")
+#api.add_resource(ProductCollection, "/api/products/")
 app.run(debug=True)
