@@ -1,0 +1,92 @@
+---
+openapi: 3.0.3
+
+servers:
+  - url: /api
+
+components:
+  parameters:
+    product:
+      description: Selected product's unique handle
+      in: path
+      name: product
+      required: true
+      schema:
+        type: string
+  schemas:
+    Product:
+      properties:
+        weight:
+          description: Product's weight
+          type: number
+        price:
+          description: Product's price
+          type: number
+      required:
+      - handle
+      - weight
+      - price
+      type: object
+  securitySchemes:
+    sensorhubKey:
+      type: apiKey
+      name: Producthub-Api-Key
+      in: header
+
+info:
+  title: Producthub Example
+  version: 0.0.1
+  description: |
+    This is an API example used in the Programmable Web Project course.
+    It stores data about products and where they have been deployed.
+  termsOfService: http://totally.not.placehold.er/
+  contact:
+    url: http://totally.not.placehold.er/
+    email: pwp-course@lists.oulu.fi
+    name: PWP Staff List
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+paths:
+  /products/:
+    get:
+      description: "Gets the list of managed products"
+      responses:
+        "200":
+          description: List of products with each products info
+          content:
+            application/json:
+              example:
+                - handle: r2lIjRlXZMWoQRz4CZyc1725546334334
+                  weight: 60.41
+                  price: 66.35
+                - handle: r2lIjRlXZMWoQRz4CZyc17255463343334
+                  weight: 60.41
+                  price: 66.35
+    post:
+      description: Create a new product
+      requestBody:
+        description: JSON document that contains basic data for a new product
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+            example:
+              handle: r2lIjRlXZMWoQRz4CZyc1725546334334
+              weight: 60.41
+              price: 66.35
+      responses:
+        '201':
+          description: The product was created successfully
+          headers:
+            Location: 
+              description: URI of the new sensor
+              schema: 
+                type: string
+        '400':
+          description: The request body was not valid
+        '409':
+          description: A sensor with the same name already exists
+        '415':
+          description: Wrong media type was used

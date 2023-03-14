@@ -1,9 +1,14 @@
 import sys
+import json
 from flask import Flask, request, Response
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
-
+from werkzeug.exceptions import NotFound, Conflict, BadRequest, UnsupportedMediaType
+from jsonschema import validate, ValidationError, draft7_format_checker
+JSON = "application/json"
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
@@ -13,6 +18,11 @@ api = Api(app)
 
 app.app_context().push()
 
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
 
 class StorageItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,6 +40,35 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
 
     in_storage = db.relationship("StorageItem", back_populates="product")
+    
+    def serialize(self):
+        return {
+            "handle": self.handle,
+            "weight": self.weight,
+            "price": self.price
+        }
+
+    @staticmethod
+    def json_schema():
+        schema = {
+            "type": "object",
+            "required": ["handle", "weight", "price"]
+        }
+        props = schema["properties"] = {}
+        props["handle"] = {
+            "description": "Product's unique handle",
+            "type": "string"
+        }
+        props["weight"] = {
+            "description": "Product's weight",
+            "type": "number"
+        }
+        props["price"] = {
+            "description": "Product's price",
+            "type": "number"
+        }
+        return schema
+    
 
 
 class ProductCollection(Resource):
@@ -39,16 +78,29 @@ class ProductCollection(Resource):
     """
 
     def get(self):
-        return Response(status=501)
+        body = {"products": []}
+        for product in Product.query.all():
+            item = product.serialize()
+            body["products"].append(item)
+        return Response(json.dumps(body), 200, mimetype=JSON)
 
     def post(self):
-        print("asd")
+        if not request.json:
+            return "", 415
+        
+        try:
+            validate(request.json, Product.json_schema(),
+                    format_checker=draft7_format_checker)
+        except ValidationError as exc:
+            raise BadRequest(description=str(exc)) from exc
+        
         try:
             handle = request.json["handle"]
             weight = request.json["weight"]
             price = request.json["price"]
         except KeyError:
             return "Incomplete request - missing fields", 400
+        
         try:
             float(weight)
             float(price)

@@ -1,5 +1,5 @@
-import sys
-from flask import Flask, request, Response
+import sqlite3
+from flask import Flask, request, g
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
@@ -12,7 +12,6 @@ db = SQLAlchemy(app)
 api = Api(app)
 
 app.app_context().push()
-
 
 class StorageItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -31,18 +30,21 @@ class Product(db.Model):
 
     in_storage = db.relationship("StorageItem", back_populates="product")
 
-
 class ProductCollection(Resource):
-    """
-        Contains methods for GET and POST of products
-        POST creates a object with handle, weight and price
-    """
 
     def get(self):
-        return Response(status=501)
+        products = Product.query.all()
+        items = []
+        for product in products:
+            item = {
+                "handle": product.handle,
+                "weight": product.weight,
+                "price": product.price
+            }
+            items.append(item)
+        return items, 200
 
     def post(self):
-        print("asd")
         try:
             handle = request.json["handle"]
             weight = request.json["weight"]
@@ -65,25 +67,11 @@ class ProductCollection(Resource):
             db.session.commit()
         except IntegrityError:
             return "Handle already exists", 409
-        response = Response(status=201)
-        print(handle)
-        response.headers["location"] = api.url_for(ProductItem, product=handle)
-        return response
-
-class ProductItem(Resource):
-
-    def get(self, product):
-        pass
-
-    def put(self, product):
-        pass
-    
-    def delete(self, product):
-        pass
-
-db.create_all()
+        return "", 201
 
 
 api.add_resource(ProductCollection, "/api/products/")
-api.add_resource(ProductItem, "/api/products/<product>")
-app.run(debug=True)
+
+
+
+db.create_all()
