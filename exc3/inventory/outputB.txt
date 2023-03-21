@@ -1,0 +1,77 @@
+{
+    "items": [
+        {
+            "handle": "test-product-1",
+            "weight": 2.1,
+            "price": 10.5,
+            "@controls": {
+                "self": {
+                    "href": "/api/products/test-product-1/"
+                },
+                "profile": {
+                    "href": "/profiles/product/"
+                }
+            }
+        },
+        {
+            "handle": "test-product-2",
+            "weight": 4.2,
+            "price": 21.0,
+            "@controls": {
+                "self": {
+                    "href": "/api/products/test-product-2/"
+                },
+                "profile": {
+                    "href": "/profiles/product/"
+                }
+            }
+        },
+        {
+            "handle": "test-product-3",
+            "weight": 6.300000000000001,
+            "price": 31.5,
+            "@controls": {
+                "self": {
+                    "href": "/api/products/test-product-3/"
+                },
+                "profile": {
+                    "href": "/profiles/product/"
+                }
+            }
+        }
+    ],
+    "@namespaces": {
+        "storage": {
+            "name": "/storage/link-relations/"
+        }
+    },
+    "@controls": {
+        "self": {
+            "href": "/api/products/"
+        },
+        "storage:add-product": {
+            "href": {
+                "type": "object",
+                "properties": {
+                    "handle": {
+                        "description": "Products unique handle",
+                        "type": "string"
+                    },
+                    "price": {
+                        "description": "Products price",
+                        "type": "number"
+                    },
+                    "weight": {
+                        "description": "Products weight",
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "handle",
+                    "price",
+                    "weight"
+                ]
+            }
+        }
+    }
+}

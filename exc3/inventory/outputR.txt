@@ -1,0 +1,81 @@
+{
+    "items": [
+        {
+            "handle": "test-product-3",
+            "weight": 6.300000000000001,
+            "price": 31.5,
+            "@controls": {
+                "self": {
+                    "href": "/api/products/test-product-3/"
+                },
+                "profile": {
+                    "href": "/profiles/error-profile/"
+                }
+            }
+        },
+        {
+            "handle": "test-product-2",
+            "weight": 4.2,
+            "price": 21.0,
+            "@controls": {
+                "self": {
+                    "href": "/api/products/test-product-2/"
+                },
+                "profile": {
+                    "href": "/profiles/error-profile/"
+                }
+            }
+        },
+        {
+            "handle": "test-product-1",
+            "weight": 2.1,
+            "price": 10.5,
+            "@controls": {
+                "self": {
+                    "href": "/api/products/test-product-1/"
+                },
+                "profile": {
+                    "href": "/profiles/error-profile/"
+                }
+            }
+        }
+    ],
+    "@namespaces": {
+        "storage": {
+            "name": "/products/link-relations/"
+        }
+    },
+    "@controls": {
+        "self": {
+            "href": "/api/products/"
+        },
+        "storage:add-product": {
+            "method": "POST",
+            "encoding": "json",
+            "title": "Add a new product",
+            "schema": {
+                "type": "object",
+                "required": [
+                    "handle",
+                    "weight",
+                    "price"
+                ],
+                "properties": {
+                    "handle": {
+                        "description": "Product's unique name",
+                        "type": "string"
+                    },
+                    "weight": {
+                        "description": "Product's weight",
+                        "type": "number"
+                    },
+                    "price": {
+                        "description": "Product's price",
+                        "type": "number"
+                    }
+                }
+            },
+            "href": "/api/products/"
+        }
+    }
+}
