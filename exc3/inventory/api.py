@@ -10,7 +10,7 @@ from werkzeug.exceptions import NotFound
 from werkzeug.routing import BaseConverter
 
 app = Flask(__name__)
-app.config["SERVER_NAME"] = "127.0.0.1:5000"
+app.config["SERVER_NAME"] = "127.0.0.1:8000"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
@@ -388,5 +388,5 @@ app.cli.add_command(init_db_command)
 app.cli.add_command(populate_db_command)
 app.cli.add_command(test_document_command)
 
-# print("Starting SensorHub flask app...\n\n")
-# app.run(debug=True)
+print("Starting SensorHub flask app...\n\n")
+app.run(debug=True)
